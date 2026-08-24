@@ -12,11 +12,20 @@ router.get('/', (req, res) => {
   const { type, search } = req.query;
   let query = 'SELECT * FROM events WHERE 1=1';
   const params = [];
+  
   if (type) { query += ' AND type = ?'; params.push(type); }
   if (search) { query += ' AND title LIKE ?'; params.push(`%${search}%`); }
   query += ' ORDER BY created_at DESC';
+  
   const events = db.prepare(query).all(...params);
-  res.json(events);
+
+  // The Fix: Fetch and attach the scheduled shows to each event
+  const enrichedEvents = events.map(e => {
+    const shows = db.prepare('SELECT * FROM shows WHERE event_id = ? ORDER BY show_date, show_time').all(e.id);
+    return { ...e, shows };
+  });
+
+  res.json(enrichedEvents);
 });
 
 // ── Get single event with all shows ────────────────────────────────────────
