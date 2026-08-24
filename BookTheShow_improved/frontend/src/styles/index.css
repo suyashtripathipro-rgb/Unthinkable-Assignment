@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+html { scroll-behavior: smooth; }
+body { background: #0B0B12; }
+
+::selection { background: #E8B84B; color: #0B0B12; }
+
+/* Perforated ticket-stub divider */
+.perforation {
+  position: relative;
+}
+.perforation::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #0B0B12 3px, transparent 3.5px);
+  background-size: 14px 14px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+/* Torn / notch corners for ticket cards */
+.ticket-card {
+  position: relative;
+  clip-path: polygon(
+    0% 8px, 8px 0%, calc(100% - 8px) 0%, 100% 8px,
+    100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px)
+  );
+}
+
+/* Marquee bulb strip */
+.marquee-strip {
+  background-image: radial-gradient(circle, #E8B84B 2.5px, transparent 3px);
+  background-size: 18px 18px;
+  background-position: center;
+  opacity: 0.55;
+}
+
+@keyframes bulb-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+.bulb {
+  animation: bulb-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+.float-slow { animation: float-slow 5s ease-in-out infinite; }
+
+.focus-ring:focus-visible {
+  outline: 2px solid #E8B84B;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar for a cinema feel */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0B0B12; }
+::-webkit-scrollbar-thumb { background: #3a3750; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #E8B84B; }
