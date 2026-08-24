@@ -148,9 +148,10 @@ function bookingConfirmedEmail({ name, eventTitle, showDate, showTime, seats, bo
         <tr>
           <td style="padding:0 32px 24px;text-align:center">
             <div style="background:#faf5ff;border:2px dashed #c4b5fd;border-radius:12px;padding:20px">
-              <div style="font-size:36px;margin-bottom:8px">📲</div>
+              <!-- CID embedded image ensures it bypasses spam filters and renders instantly -->
+              <img src="cid:ticket-qr" alt="Your QR Ticket" style="width:150px; height:150px; margin-bottom:12px; border-radius:8px;" />
               <div style="font-weight:700;color:#6d28d9;margin-bottom:4px">Show QR at the Venue Entrance</div>
-              <div style="color:#9ca3af;font-size:13px">Your QR code ticket is attached to this email as a PNG file. Download and keep it handy!</div>
+              <div style="color:#9ca3af;font-size:13px">Keep this QR code handy for scanning at the door.</div>
             </div>
           </td>
         </tr>
