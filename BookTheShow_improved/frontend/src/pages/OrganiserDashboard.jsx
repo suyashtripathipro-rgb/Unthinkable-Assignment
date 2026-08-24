@@ -10,7 +10,7 @@ export default function OrganiserDashboard() {
   const [busy, setBusy] = useState(false);
 
   const [eventForm, setEventForm] = useState({ title: '', type: 'movie', description: '', posterUrl: '' });
-  const [showForm, setShowForm] = useState({ eventId: '', venueId: '', showDate: '', showTime: '', holdTtlSeconds: 600 });
+  const [showForm, setShowForm] = useState({ event_id: '', venue_id: '', show_date: '', show_time: '', holdTtlSeconds: 600 });
   const [pricing, setPricing] = useState({});
   const [summaries, setSummaries] = useState({});
 
@@ -22,7 +22,7 @@ export default function OrganiserDashboard() {
     client.get('/venues').then((res) => setVenues(res.data));
   }, []);
 
-  const selectedVenue = venues.find((v) => String(v.id) === String(showForm.venueId));
+  const selectedVenue = venues.find((v) => String(v.id) === String(showForm.venue_id));
   const categoriesForVenue = selectedVenue ? [...new Set(selectedVenue.layout.map((r) => r.category))] : [];
 
   async function createEvent(e) {
@@ -33,7 +33,7 @@ export default function OrganiserDashboard() {
     try {
       await client.post('/events', eventForm);
       setEventForm({ title: '', type: 'movie', description: '', posterUrl: '' });
-      setNotice('Event created. Now schedule a showtime for it below.');
+      setNotice('Event created. Now schedule a show_time for it below.');
       loadEvents();
     } catch (err) {
       setError(err.response?.data?.error || 'Could not create event.');
@@ -50,33 +50,33 @@ export default function OrganiserDashboard() {
     try {
       const missing = categoriesForVenue.filter((c) => !pricing[c]);
       if (missing.length) throw { response: { data: { error: `Set a price for: ${missing.join(', ')}` } } };
-      await client.post(`/events/${showForm.eventId}/shows`, {
-        venueId: Number(showForm.venueId),
-        showDate: showForm.showDate,
-        showTime: showForm.showTime,
+      await client.post(`/events/${showForm.event_id}/shows`, {
+        venue_id: Number(showForm.venue_id),
+        show_date: showForm.show_date,
+        show_time: showForm.show_time,
         holdTtlSeconds: Number(showForm.holdTtlSeconds),
         pricing: Object.fromEntries(Object.entries(pricing).map(([k, v]) => [k, Number(v)])),
       });
-      setNotice('Showtime scheduled with seat map generated.');
-      setShowForm({ eventId: '', venueId: '', showDate: '', showTime: '', holdTtlSeconds: 600 });
+      setNotice('show_time scheduled with seat map generated.');
+      setShowForm({ event_id: '', venue_id: '', show_date: '', show_time: '', holdTtlSeconds: 600 });
       setPricing({});
       loadEvents();
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not create showtime.');
+      setError(err.response?.data?.error || 'Could not create show_time.');
     } finally {
       setBusy(false);
     }
   }
 
-  async function loadSummary(eventId) {
-    const { data } = await client.get(`/events/${eventId}/summary`);
-    setSummaries((s) => ({ ...s, [eventId]: data }));
+  async function loadSummary(event_id) {
+    const { data } = await client.get(`/events/${event_id}/summary`);
+    setSummaries((s) => ({ ...s, [event_id]: data }));
   }
 
   return (
     <div className="max-w-5xl mx-auto px-5 py-12">
       <h1 className="font-display text-5xl tracking-wide mb-1">ORGANISER DESK</h1>
-      <p className="text-paperDim mb-8">Create listings, schedule showtimes, track revenue.</p>
+      <p className="text-paperDim mb-8">Create listings, schedule show_times, track revenue.</p>
 
       {error && <p className="text-booked text-sm mb-4">{error}</p>}
       {notice && <p className="text-available text-sm mb-4">{notice}</p>}
@@ -142,12 +142,12 @@ export default function OrganiserDashboard() {
           onSubmit={createShow}
           className="ticket-card bg-stage2 border border-white/10 p-6"
         >
-          <h2 className="font-display text-2xl tracking-wide mb-4">Schedule a showtime</h2>
+          <h2 className="font-display text-2xl tracking-wide mb-4">Schedule a show_time</h2>
           <Field label="Event">
             <select
               required
-              value={showForm.eventId}
-              onChange={(e) => setShowForm({ ...showForm, eventId: e.target.value })}
+              value={showForm.event_id}
+              onChange={(e) => setShowForm({ ...showForm, event_id: e.target.value })}
               className="input"
             >
               <option value="">Select…</option>
@@ -161,9 +161,9 @@ export default function OrganiserDashboard() {
           <Field label="Venue">
             <select
               required
-              value={showForm.venueId}
+              value={showForm.venue_id}
               onChange={(e) => {
-                setShowForm({ ...showForm, venueId: e.target.value });
+                setShowForm({ ...showForm, venue_id: e.target.value });
                 setPricing({});
               }}
               className="input"
@@ -181,8 +181,8 @@ export default function OrganiserDashboard() {
               <input
                 type="date"
                 required
-                value={showForm.showDate}
-                onChange={(e) => setShowForm({ ...showForm, showDate: e.target.value })}
+                value={showForm.show_date}
+                onChange={(e) => setShowForm({ ...showForm, show_date: e.target.value })}
                 className="input"
               />
             </Field>
@@ -190,8 +190,8 @@ export default function OrganiserDashboard() {
               <input
                 type="time"
                 required
-                value={showForm.showTime}
-                onChange={(e) => setShowForm({ ...showForm, showTime: e.target.value })}
+                value={showForm.show_time}
+                onChange={(e) => setShowForm({ ...showForm, show_time: e.target.value })}
                 className="input"
               />
             </Field>
@@ -226,7 +226,7 @@ export default function OrganiserDashboard() {
             </Field>
           )}
           <button disabled={busy} className="w-full py-2.5 rounded-full bg-violet text-white font-semibold mt-2">
-            Schedule showtime
+            Schedule show_time
           </button>
         </motion.form>
       </div>
@@ -253,7 +253,7 @@ export default function OrganiserDashboard() {
                 {summaries[ev.id].summary.map((s) => (
                   <div key={s.showId} className="flex justify-between border-t border-white/5 pt-2">
                     <span className="text-paperDim">
-                      {s.showDate} {s.showTime} — {s.seatsSold} seats · {s.bookingsCount} bookings
+                      {s.show_date} {s.show_time} — {s.seatsSold} seats · {s.bookingsCount} bookings
                     </span>
                     <span className="text-marquee font-mono">₹{s.revenue}</span>
                   </div>
