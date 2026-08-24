@@ -19,10 +19,23 @@ router.get('/', (req, res) => {
   
   const events = db.prepare(query).all(...params);
 
-  // The Fix: Fetch and attach the scheduled shows to each event
+  // The Fix: Join venue names and parse the pricing JSON safely
   const enrichedEvents = events.map(e => {
-    const shows = db.prepare('SELECT * FROM shows WHERE event_id = ? ORDER BY show_date, show_time').all(e.id);
-    return { ...e, shows };
+    const shows = db.prepare(`
+      SELECT s.*, v.name as venue_name 
+      FROM shows s 
+      JOIN venues v ON v.id = s.venue_id 
+      WHERE s.event_id = ? 
+      ORDER BY show_date, show_time
+    `).all(e.id);
+    
+    return { 
+      ...e, 
+      shows: shows.map(s => ({ 
+        ...s, 
+        pricing: s.pricing_json ? JSON.parse(s.pricing_json) : {} 
+      })) 
+    };
   });
 
   res.json(enrichedEvents);
