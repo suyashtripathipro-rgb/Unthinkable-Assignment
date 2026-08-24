@@ -103,4 +103,22 @@ router.get('/organiser/mine', authRequired, requireRole('organiser', 'admin'), (
   res.json(enriched);
 });
 
+// ── Get revenue summary for a specific event ──────────────────────────────
+router.get('/:id/summary', authRequired, requireRole('organiser', 'admin'), (req, res) => {
+  const shows = db.prepare(`
+    SELECT 
+      s.id as showId, 
+      s.show_date, 
+      s.show_time, 
+      COALESCE((SELECT SUM(b.total_amount) FROM bookings b WHERE b.show_id=s.id AND b.status='confirmed'), 0) as revenue,
+      (SELECT COUNT(*) FROM seats WHERE show_id=s.id AND status='booked') as seatsSold,
+      (SELECT COUNT(*) FROM bookings b WHERE b.show_id=s.id AND b.status='confirmed') as bookingsCount
+    FROM shows s 
+    WHERE s.event_id = ?
+  `).all(req.params.id);
+
+  const totalRevenue = shows.reduce((sum, show) => sum + show.revenue, 0);
+  res.json({ summary: shows, totalRevenue });
+});
+
 module.exports = router;
