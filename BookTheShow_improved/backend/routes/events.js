@@ -41,7 +41,9 @@ router.post('/:id/shows', authRequired, requireRole('organiser', 'admin'), async
   const event = db.prepare('SELECT * FROM events WHERE id = ?').get(req.params.id);
   if (!event) return res.status(404).json({ error: 'Event not found' });
   if (event.organiser_id !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'Not your event' });
-
+  req.body.venue_id = req.body.venue_id || req.body.venueId;
+  req.body.show_date = req.body.show_date || req.body.showDate;
+  req.body.show_time = req.body.show_time || req.body.showTime;
   const { venue_id, show_date, show_time, pricing, hold_ttl_seconds } = req.body;
   if (!venue_id || !show_date || !show_time || !pricing) return res.status(400).json({ error: 'venue_id, show_date, show_time and pricing required' });
 
