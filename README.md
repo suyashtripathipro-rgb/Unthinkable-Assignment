@@ -1,3 +1,5 @@
+## <span style="background-color: #FFD700"> NOTE- WEBSITE'S BACKEND SERVER GOES INTO SLEEP AFTER 15 MINUTES OF INACTIVITY, SO YOU MAY FEEL THE HIGH LATENCY IN LOGIN IN ON THE WEBSITE </span>
+
 # 🎬 BookTheShow: High-Concurrency Ticket Booking System
 
 BookTheShow is a full-stack, real-time ticket booking platform designed to handle high-demand event drops. It features visual seat maps, real-time inventory locking, automated waitlist reallocation, and QR code ticket generation. This project fulfills all core specifications of a high-concurrency ticketing system, ensuring no double-bookings and zero wasted inventory.
