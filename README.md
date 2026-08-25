@@ -63,6 +63,10 @@ When attempting to send a ticket via direct SSL Gmail in production, the backgro
 
 * **Impact:** The booking still completes successfully in the database, but the automated email fails to fire due to the hosting provider's firewall. 
 * **Resolution:** A production-grade fix would involve migrating from raw SMTP to an HTTP-based email API provider (like Resend or SendGrid).
+  
+**Note- This timeout is there due to that i am using the free version of RENDER.**
+  <img width="1362" height="85" alt="image" src="https://github.com/user-attachments/assets/839e8044-952c-4d27-8525-6d2abf9d0850" />
+
 
 ---
 
