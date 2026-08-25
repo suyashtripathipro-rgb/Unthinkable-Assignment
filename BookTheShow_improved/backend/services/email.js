@@ -16,14 +16,17 @@ let _transporter = null;
 async function getTransporter() {
   if (_transporter) return _transporter;
 
-  // ── Option 1: Gmail via App Password (simplest real-world option) ──────────
+ // ── Option 1: Gmail via App Password ──────────
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-    console.log('[email] Using Gmail (App Password) for', process.env.GMAIL_USER);
+    console.log('[email] Using pooled Gmail for', process.env.GMAIL_USER);
     _transporter = nodemailer.createTransport({
       service: 'gmail',
+      pool: true,             // Keeps the connection alive for instant sending
+      maxConnections: 5,      // Allows 5 emails to send simultaneously
+      maxMessages: 100,       // Sends 100 emails before recycling the connection
       auth: {
         user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,   // 16-char App Password, NOT account password
+        pass: process.env.GMAIL_APP_PASSWORD, 
       },
     });
     return _transporter;
