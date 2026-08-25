@@ -317,4 +317,24 @@ function bookingCancelledEmail({ name, eventTitle, showDate, bookingRef, refundN
 </html>`;
 }
 
-module.exports = { sendMail, bookingConfirmedEmail, waitlistOfferEmail, bookingCancelledEmail };
+
+/** Packages the HTML and the CID QR Code into a single deliverable payload */
+async function sendTicketEmail(toEmail, ticketData, qrDataUrl) {
+  const html = bookingConfirmedEmail(ticketData);
+  const rawBase64 = qrDataUrl.split(';base64,').pop();
+
+  return sendMail({
+    to: toEmail,
+    subject: `Your Tickets for ${ticketData.eventTitle}`,
+    html: html,
+    attachments: [
+      {
+        filename: 'ticket-qr.png',
+        content: rawBase64,
+        encoding: 'base64',
+        cid: 'ticket-qr' // This perfectly matches the <img src="cid:ticket-qr"> in the template
+      }
+    ]
+  });
+}
+module.exports = { sendMail, sendTicketEmail, bookingConfirmedEmail, waitlistOfferEmail, bookingCancelledEmail };
