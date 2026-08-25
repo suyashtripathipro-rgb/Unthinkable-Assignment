@@ -6,7 +6,7 @@ BookTheShow is a full-stack, real-time ticket booking platform designed to handl
 
 ---
 
-## ⚠️ Known Deployment Limitations (Email Issue)
+## ⚠️ Known Deployment Limitations (Email Issue)*
 
 While the email service (`nodemailer`) works perfectly in a local environment, live deployment platforms (like Vercel/Render) often block outbound SMTP connections on ports 465/587.
 
@@ -18,6 +18,28 @@ When attempting to send a ticket via direct SSL Gmail in production, the backgro
 **Note- This timeout is there due to that i am using the free version of RENDER.**
   <img width="1362" height="85" alt="image" src="https://github.com/user-attachments/assets/839e8044-952c-4d27-8525-6d2abf9d0850" />
 
+
+---
+## 📁 Project Structure
+
+```
+BookTheShow/
+├── backend/          # Node.js + Express + SQLite API
+│   ├── db/           # Schema (index.js) + seed data (seed.js)
+│   ├── middleware/   # JWT auth (auth.js)
+│   ├── routes/       # auth, events, venues, bookings
+│   ├── services/     # email, qrcode, seatService, realtime, scheduler
+│   ├── server.js
+│   ├── .env.example
+│   └── vercel.json
+└── frontend/         # React + Vite + Tailwind CSS
+    ├── src/
+    │   ├── api/      # axios client + AuthContext
+    │   ├── components/  # Navbar, SeatMap, Countdown
+    │   └── pages/    # Home, ShowDetail, Login, Register, BookingHistory, ...
+    ├── .env.example
+    └── vercel.json
+```
 
 ---
 
@@ -131,6 +153,25 @@ Tickets generate a unique booking reference encoded into a QR code (`services/qr
    cd ../frontend
    npm run dev  # Starts the Vite React app
    ```
+---   
+## 📧 Gmail Email Setup (Required for real emails)
+
+> Without this, emails go to a free Ethereal test inbox — a preview URL is printed in the server console.
+
+### Steps to enable Gmail:
+
+1. Go to your Google Account → **Security** → enable **2-Step Verification**
+2. Go to: https://myaccount.google.com/apppasswords
+3. Select **"Mail"** → **"Other"** → type `BookTheShow` → click **Generate**
+4. Copy the **16-character App Password**
+5. Set in your `.env`:
+
+```env
+GMAIL_USER=your_real_gmail@gmail.com
+GMAIL_APP_PASSWORD=abcd efgh ijkl mnop
+```
+
+That's it — no OAuth, no extra packages. Nodemailer handles the rest.
 
 ---
 
@@ -168,3 +209,101 @@ The system uses SQLite for rapid deployment and transactional safety.
 * `POST /api/events` - Create a new movie/concert listing.
 * `POST /api/events/:id/shows` - Schedule a show and dynamically generate seat rows based on venue layout.
 * `POST /api/events/:id/summary` - Fetch revenue and ticket sale analytics.
+
+---
+
+## 🚀 Deployment Guide
+
+### Overview
+
+| Part     | Host          | Why                                      |
+|----------|---------------|------------------------------------------|
+| Backend  | **Render**    | Free tier, supports Node + persistent disk for SQLite |
+| Frontend | **Vercel**    | Free, instant deploys from GitHub for React/Vite |
+
+> **Note:** Vercel does NOT support persistent file storage, so SQLite on Vercel's filesystem resets on every deploy. Use Render (or Railway) for the backend.
+
+---
+
+### Step 1 — Deploy Backend to Render
+
+1. Push your project to a **GitHub repository** (public or private)
+
+2. Go to https://render.com → **Sign up / Log in**
+
+3. Click **"New +"** → **"Web Service"**
+
+4. Connect your GitHub repo → select the repo
+
+5. Set these settings:
+   - **Root Directory:** `backend`
+   - **Runtime:** `Node`
+   - **Build Command:** `npm install`
+   - **Start Command:** `node server.js`
+
+6. Under **Environment Variables**, add:
+   ```
+   NODE_ENV          = production
+   JWT_SECRET        = <generate: node -e "console.log(require('crypto').randomBytes(48).toString('hex'))">
+   GMAIL_USER        = your_gmail@gmail.com
+   GMAIL_APP_PASSWORD= abcd efgh ijkl mnop
+   FRONTEND_URL      = https://your-app.vercel.app   ← fill after Step 2
+   WAITLIST_OFFER_TTL_SECONDS = 300
+   SCHEDULER_TICK_MS = 10000
+   ```
+
+7. Click **"Create Web Service"** — Render builds and starts your API
+
+8. **Copy your Render URL** — looks like `https://bookyourshow-api.onrender.com`
+
+9. After first deploy, open Render's **Shell** tab and run:
+   ```bash
+   node db/seed.js
+   ```
+   This seeds demo venues and events.
+
+---
+
+### Step 2 — Deploy Frontend to Vercel
+
+1. Go to https://vercel.com → **Sign up / Log in** (use GitHub)
+
+2. Click **"Add New Project"** → import your GitHub repo
+
+3. Set **Root Directory** to `frontend`
+
+4. Under **Environment Variables**, add:
+   ```
+   VITE_API_URL    = https://bookyourshow-api.onrender.com/api
+   VITE_SOCKET_URL = https://bookyourshow-api.onrender.com
+   ```
+
+5. Click **"Deploy"** — Vercel builds and gives you a URL like `https://booktheshow.vercel.app`
+
+6. **Go back to Render** → update `FRONTEND_URL` env var to your Vercel URL → Render auto-redeploys
+
+---
+
+### Step 3 — Test it live
+
+1. Open your Vercel URL
+2. Register as a customer, browse events, select seats
+3. Complete checkout → check your email for the QR ticket
+4. Test waitlist: fill all seats, join waitlist, cancel a booking → you'll receive the offer email
+
+---
+
+## ✅ Evaluation Checklist
+
+| Criteria | Implementation |
+|---|---|
+| Seat hold TTL & auto-release | `hold_expires_at` column + SQLite transaction + scheduler every 5s |
+| Concurrency protection | Synchronous `better-sqlite3` transaction — atomic check + write |
+| Waitlist auto-assignment | FIFO queue, cascading offer on cancel/expiry |
+| Time-limited waitlist offer | `offer_expires_at` enforced by scheduler, cascades to next |
+| Real-time seat map updates | Socket.IO rooms per show, broadcast on every status change |
+| QR code generation | `qrcode` npm package → PNG buffer attached to email |
+| **Email delivery (Gmail)*** | Nodemailer + Gmail App Password — beautiful HTML templates (**Deployment Limitation Is Also Provided Above**) |
+| Cancellation email | Sent to customer on every cancellation |
+| Role-based auth | JWT with `customer` / `organiser` / `admin` roles |
+| API design & docs | RESTful routes, error codes, this README |
