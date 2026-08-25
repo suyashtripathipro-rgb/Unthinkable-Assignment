@@ -10,6 +10,7 @@ BookTheShow is a full-stack, real-time ticket booking platform designed to handl
 * **React.js (Vite):** Fast, modern frontend framework for building the user interface.
 * **Tailwind CSS:** Utility-first CSS framework for responsive and rapid styling.
 * **Context API:** For managing global authentication state (`AuthContext.jsx`).
+* **In Frontend Deployment, I have Used Free-Version of Vercel for the deployment of the Website.**
 
 ### Backend
 * **Node.js & Express.js:** RESTful API creation and server routing (`routes/auth.js`, `routes/bookings.js`, etc.).
@@ -18,6 +19,7 @@ BookTheShow is a full-stack, real-time ticket booking platform designed to handl
 * **Nodemailer:** Handles async email dispatch for tickets and waitlist offers (`services/email.js`).
 * **QR Code (qrcode):** Generates scannable ticket references attached to confirmation emails (`services/qrcode.js`).
 * **Custom Background Scheduler:** A timed worker checking database records for TTL expiration (`services/scheduler.js`).
+* **In Backend Deployment, I have Used Free-Version Of Render for database and server deployment**
 
 ---
 
