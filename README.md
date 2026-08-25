@@ -12,6 +12,9 @@ BookTheShow is a full-stack, real-time ticket booking platform designed to handl
 * **Context API:** For managing global authentication state (`AuthContext.jsx`).
 * **In Frontend Deployment, I have Used Free-Version of Vercel for the deployment of the Website.**
 
+<img width="1917" height="868" alt="image" src="https://github.com/user-attachments/assets/cbfdaa8f-8502-4cb3-95c9-282ac4b87f6e" />
+
+
 ### Backend
 * **Node.js & Express.js:** RESTful API creation and server routing (`routes/auth.js`, `routes/bookings.js`, etc.).
 * **SQLite:** Lightweight, transactional database used for rapid deployment and synchronous transaction locking.
@@ -20,6 +23,11 @@ BookTheShow is a full-stack, real-time ticket booking platform designed to handl
 * **QR Code (qrcode):** Generates scannable ticket references attached to confirmation emails (`services/qrcode.js`).
 * **Custom Background Scheduler:** A timed worker checking database records for TTL expiration (`services/scheduler.js`).
 * **In Backend Deployment, I have Used Free-Version Of Render for database and server deployment**
+
+  <img width="1887" height="978" alt="image" src="https://github.com/user-attachments/assets/82852221-e49c-4bcf-846a-a92aa39babe3" />
+  <img width="1917" height="972" alt="image" src="https://github.com/user-attachments/assets/05523b24-031f-492a-b978-c47afcf4fe48" />
+
+
 
 ---
 
