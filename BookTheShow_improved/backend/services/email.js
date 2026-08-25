@@ -58,37 +58,34 @@ async function getTransporter() {
 // Core send wrapper — Global "Fire and Forget" implementation.
 // ---------------------------------------------------------------------------
 function sendMail({ to, subject, html, attachments = [] }) {
-  // 1. We wrap the heavy lifting in a setTimeout. 
-  // This pushes the SMTP network request into Node's background event loop.
+  // 1. Strict validation: Ensure the 'to' address actually exists
+  if (!to) {
+    console.error(`[email] ❌ FATAL: Attempted to send "${subject}" but the recipient email is missing!`);
+    return Promise.resolve({ status: 'failed_missing_recipient' });
+  }
+
+  console.log(`[email] ⏳ Preparing to send "${subject}" to exactly: ${to}`);
+
   setTimeout(async () => {
     try {
       const transporter = await getTransporter();
-      const from =
-        process.env.GMAIL_USER
-          ? `"BookTheShow" <${process.env.GMAIL_USER}>`
-          : process.env.MAIL_FROM || '"BookTheShow" <tickets@bookyourshow.dev>';
+      const from = process.env.GMAIL_USER 
+        ? `"BookTheShow" <${process.env.GMAIL_USER}>` 
+        : process.env.MAIL_FROM || '"BookTheShow" <tickets@bookyourshow.dev>';
 
       const info = await transporter.sendMail({ from, to, subject, html, attachments });
 
-      // Ethereal preview link (only available in test mode)
       const preview = nodemailer.getTestMessageUrl(info);
       if (preview) console.log(`[email] 📬 Preview: ${preview}`);
-
-      console.log(`[email] ✅ Sent "${subject}" → ${to}  (id: ${info.messageId})`);
+      console.log(`[email] ✅ Successfully Delivered "${subject}" → ${to}  (id: ${info.messageId})`);
     } catch (err) {
-      console.error('[email] ❌ send failed:', err.message);
-      // Invalidate transporter so next call tries to create a fresh one
+      console.error('[email] ❌ Delivery failed:', err.message);
       _transporter = null;
     }
   }, 0);
 
-  // 2. We instantly return a success queue status to the API caller.
-  // The API will finish the checkout and show the success screen in milliseconds,
-  // while the email quietly sends itself in the background.
-  // Wrapping the response in Promise.resolve() satisfies the .catch() calls throughout your app
   return Promise.resolve({ status: 'queued_in_background' });
 }
-
 // ---------------------------------------------------------------------------
 // Email templates
 // ---------------------------------------------------------------------------
