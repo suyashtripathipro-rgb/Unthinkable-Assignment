@@ -18,12 +18,11 @@ async function getTransporter() {
 
  // ── Option 1: Gmail via App Password ──────────
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-    console.log('[email] Using pooled Gmail for', process.env.GMAIL_USER);
+    console.log('[email] Using direct SSL Gmail for', process.env.GMAIL_USER);
     _transporter = nodemailer.createTransport({
-      service: 'gmail',
-      pool: true,             // Keeps the connection alive for instant sending
-      maxConnections: 5,      // Allows 5 emails to send simultaneously
-      maxMessages: 100,       // Sends 100 emails before recycling the connection
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // Forces strict SSL instead of relying on default STARTTLS
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD, 
