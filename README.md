@@ -4,6 +4,23 @@ BookTheShow is a full-stack, real-time ticket booking platform designed to handl
 
 ### LIVE DEPLOYMENT URL- https://unthinkable-assignment-omega.vercel.app/
 
+---
+
+## ⚠️ Known Deployment Limitations (Email Issue)
+
+While the email service (`nodemailer`) works perfectly in a local environment, live deployment platforms (like Vercel/Render) often block outbound SMTP connections on ports 465/587.
+
+When attempting to send a ticket via direct SSL Gmail in production, the background email worker may throw a `Delivery failed: Connection timeout` error. 
+
+* **Impact:** The booking still completes successfully in the database, but the automated email fails to fire due to the hosting provider's firewall. 
+* **Resolution:** A production-grade fix would involve migrating from raw SMTP to an HTTP-based email API provider (like Resend or SendGrid).
+  
+**Note- This timeout is there due to that i am using the free version of RENDER.**
+  <img width="1362" height="85" alt="image" src="https://github.com/user-attachments/assets/839e8044-952c-4d27-8525-6d2abf9d0850" />
+
+
+---
+
 ## 💻 Tech Stack & Tools
 
 ### Frontend
@@ -60,21 +77,6 @@ When an event category sells out, users can join a waitlist queue.
 Tickets generate a unique booking reference encoded into a QR code (`services/qrcode.js`). 
 * To prevent email server latency from slowing down the user's checkout experience, emails are dispatched using an asynchronous "Fire and Forget" wrapper. 
 * QR codes are embedded as CID attachments to bypass strict email spam filters.
-
----
-
-## ⚠️ Known Deployment Limitations (Email Issue)
-
-While the email service (`nodemailer`) works perfectly in a local environment, live deployment platforms (like Vercel/Render) often block outbound SMTP connections on ports 465/587.
-
-When attempting to send a ticket via direct SSL Gmail in production, the background email worker may throw a `Delivery failed: Connection timeout` error. 
-
-* **Impact:** The booking still completes successfully in the database, but the automated email fails to fire due to the hosting provider's firewall. 
-* **Resolution:** A production-grade fix would involve migrating from raw SMTP to an HTTP-based email API provider (like Resend or SendGrid).
-  
-**Note- This timeout is there due to that i am using the free version of RENDER.**
-  <img width="1362" height="85" alt="image" src="https://github.com/user-attachments/assets/839e8044-952c-4d27-8525-6d2abf9d0850" />
-
 
 ---
 
