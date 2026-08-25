@@ -85,7 +85,8 @@ function sendMail({ to, subject, html, attachments = [] }) {
   // 2. We instantly return a success queue status to the API caller.
   // The API will finish the checkout and show the success screen in milliseconds,
   // while the email quietly sends itself in the background.
-  return { status: 'queued_in_background' };
+  // Wrapping the response in Promise.resolve() satisfies the .catch() calls throughout your app
+  return Promise.resolve({ status: 'queued_in_background' });
 }
 
 // ---------------------------------------------------------------------------
