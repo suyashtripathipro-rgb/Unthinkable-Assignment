@@ -1,7 +1,7 @@
 ## <span style="background-color: #FFD700; color: #000000; padding: 6px 12px; display: block; text-align: center; border-radius: 6px; font-weight: 800;">⚠️ IMPORTANT NOTICE: SERVER COLD START LATENCY</span>
 
 > **The backend server is hosted on Render's free tier, which goes to sleep after 15 minutes of inactivity.** 
-> If you experience a brief delay or hanging during login or sign-up, **please wait a moment** for the server to wake up from its sleep state. Once awake, all subsequent requests will be completely instantaneous!
+> **If you experience a brief delay or hanging during login or sign-up**, **please wait a moment** for the server to wake up from its sleep state. Once awake, all subsequent requests will be completely instantaneous!
 
 # 🎬 BookTheShow: High-Concurrency Ticket Booking System
 
